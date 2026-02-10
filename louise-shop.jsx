@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ShoppingCart, Heart, Menu, X, Star, Check, ArrowRight, Phone, Mail, Instagram, Facebook, MapPin, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
 
 const LouiseShop = () => {
@@ -13,6 +13,12 @@ const LouiseShop = () => {
     sujet: 'Question sur un produit',
     message: ''
   });
+
+  // Refs pour les uncontrolled inputs
+  const nomInputRef = useRef(null);
+  const emailInputRef = useRef(null);
+  const sujetSelectRef = useRef(null);
+  const messageTextareaRef = useRef(null);
 
   // Produits du catalogue
   const products = [
@@ -199,7 +205,6 @@ const LouiseShop = () => {
   // Page d'accueil
   const HomePage = () => (
     <div className="home-page">
-      {/* Bannière principale avec carousel */}
       <div className="hero-banner">
         <div className="banner-slider">
           {bannerSlides.map((slide, index) => (
@@ -239,7 +244,6 @@ const LouiseShop = () => {
         </div>
       </div>
 
-      {/* Produits populaires */}
       <section className="section">
         <div className="container">
           <div className="section-header">
@@ -261,7 +265,6 @@ const LouiseShop = () => {
         </div>
       </section>
 
-      {/* Offre spéciale */}
       <section className="promo-section">
         <div className="container">
           <div className="promo-card">
@@ -280,7 +283,6 @@ const LouiseShop = () => {
         </div>
       </section>
 
-      {/* Témoignages */}
       <section className="section testimonials-section">
         <div className="container">
           <div className="section-header">
@@ -307,7 +309,6 @@ const LouiseShop = () => {
         </div>
       </section>
 
-      {/* Avantages */}
       <section className="features-section">
         <div className="container">
           <div className="features-grid">
@@ -406,7 +407,6 @@ const LouiseShop = () => {
   // Page produit détaillée
   const ProductPage = () => {
     if (!selectedProduct) return null;
-
     return (
       <div className="product-page">
         <div className="container">
@@ -469,7 +469,6 @@ const LouiseShop = () => {
             </div>
           </div>
 
-          {/* Avis clients */}
           <div className="product-reviews">
             <h2>Avis Clients</h2>
             <div className="reviews-list">
@@ -556,6 +555,7 @@ const LouiseShop = () => {
               <a href="https://wa.me/261347310555" className="btn-primary btn-large" target="_blank" rel="noopener noreferrer">
                 Procéder au paiement
               </a>
+
               <p className="security-note">
                 <Check size={16} color="#d4a574" />
                 Paiement 100% sécurisé
@@ -616,8 +616,8 @@ const LouiseShop = () => {
           <div className="about-section">
             <h2>Notre Engagement</h2>
             <p>
-              Chez Louise Shop, nous nous engageons à vous offrir une expérience d'achat exceptionnelle. De la sélection de nos produits
-              à la livraison à votre porte, chaque étape est pensée pour votre confort et votre satisfaction.
+              Chez Louise Shop, nous nous engageons à vous offrir une expérience d'achat exceptionnelle. De la sélection
+              de nos produits à la livraison à votre porte, chaque étape est pensée pour votre confort et votre satisfaction.
             </p>
             <p>
               Nous travaillons avec des fournisseurs de confiance qui partagent nos valeurs de qualité et d'éthique. Chaque achat chez
@@ -690,19 +690,22 @@ const LouiseShop = () => {
               className="contact-form"
               onSubmit={(e) => {
                 e.preventDefault();
-                const formattedMessage = `Nom: ${contactForm.nom}\nEmail: ${contactForm.email}\nSujet: ${contactForm.sujet}\nMessage: ${contactForm.message}`;
+                const nom = nomInputRef.current.value;
+                const email = emailInputRef.current.value;
+                const sujet = sujetSelectRef.current.value;
+                const message = messageTextareaRef.current.value;
+                const formattedMessage = `Nom: ${nom}\nEmail: ${email}\nSujet: ${sujet}\nMessage: ${message}`;
                 const encodedMessage = encodeURIComponent(formattedMessage);
                 window.open(`https://m.me/tolonjanahary.marcelo.1?text=${encodedMessage}`, '_blank');
-                setContactForm({ nom: '', email: '', sujet: 'Question sur un produit', message: '' });
+                e.target.reset();
               }}
             >
               <div className="form-group">
                 <label>Nom complet</label>
                 <input
+                  ref={nomInputRef}
                   type="text"
                   placeholder="Marie Dupont"
-                  value={contactForm.nom}
-                  onChange={(e) => setContactForm({ ...contactForm, nom: e.target.value })}
                   required
                 />
               </div>
@@ -710,20 +713,16 @@ const LouiseShop = () => {
               <div className="form-group">
                 <label>Email</label>
                 <input
+                  ref={emailInputRef}
                   type="email"
                   placeholder="marie@example.com"
-                  value={contactForm.email}
-                  onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
                   required
                 />
               </div>
 
               <div className="form-group">
                 <label>Sujet</label>
-                <select
-                  value={contactForm.sujet}
-                  onChange={(e) => setContactForm({ ...contactForm, sujet: e.target.value })}
-                >
+                <select ref={sujetSelectRef} defaultValue="Question sur un produit">
                   <option>Question sur un produit</option>
                   <option>Suivi de commande</option>
                   <option>Retour/Échange</option>
@@ -734,10 +733,9 @@ const LouiseShop = () => {
               <div className="form-group">
                 <label>Message</label>
                 <textarea
+                  ref={messageTextareaRef}
                   rows="5"
                   placeholder="Votre message..."
-                  value={contactForm.message}
-                  onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
                   required
                 ></textarea>
               </div>
@@ -834,6 +832,11 @@ const LouiseShop = () => {
           box-sizing: border-box;
         }
 
+        body {
+          margin: 0;
+          padding: 0;
+        }
+
         .louise-shop {
           font-family: 'Montserrat', sans-serif;
           color: #2d2d2d;
@@ -841,7 +844,6 @@ const LouiseShop = () => {
           min-height: 100vh;
         }
 
-        /* Navigation */
         .nav-bar {
           background: rgba(255, 255, 255, 0.98);
           backdrop-filter: blur(10px);
@@ -889,7 +891,6 @@ const LouiseShop = () => {
           font-weight: 700;
           box-shadow: 0 6px 18px rgba(120, 80, 40, 0.25);
           border: 2px solid rgba(255,255,255,0.09);
-          transform-origin: left center;
         }
 
         .logo-img {
@@ -909,11 +910,6 @@ const LouiseShop = () => {
           display: inline-flex;
           align-items: center;
           line-height: 1;
-        }
-
-        .nav-logo:hover .logo-icon {
-          transform: scale(1.03) translateY(-2px);
-          box-shadow: 0 14px 36px rgba(150,100,50,0.5), inset 0 -6px 14px rgba(0,0,0,0.14);
         }
 
         .nav-links {
@@ -999,7 +995,6 @@ const LouiseShop = () => {
           color: #2d2d2d;
         }
 
-        /* Hero Banner */
         .hero-banner {
           position: relative;
           height: 420px;
@@ -1046,18 +1041,6 @@ const LouiseShop = () => {
           align-items: center;
           text-align: center;
           padding: 2rem;
-          animation: slideIn 1s ease;
-        }
-
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
         }
 
         .slide-title {
@@ -1128,7 +1111,6 @@ const LouiseShop = () => {
           border-radius: 5px;
         }
 
-        /* Buttons */
         .cta-btn, .btn-primary {
           background: linear-gradient(135deg, #d4a574 0%, #c99159 100%);
           color: white;
@@ -1209,7 +1191,6 @@ const LouiseShop = () => {
           transform: translateY(-3px);
         }
 
-        /* Sections */
         .section {
           padding: 5rem 0;
         }
@@ -1245,7 +1226,6 @@ const LouiseShop = () => {
           margin-top: 3rem;
         }
 
-        /* Products Grid */
         .products-grid {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -1391,7 +1371,6 @@ const LouiseShop = () => {
           justify-content: center;
         }
 
-        /* Promo Section */
         .promo-section {
           background: linear-gradient(135deg, #f9f3ee 0%, #f0e6dc 100%);
           padding: 5rem 0;
@@ -1448,7 +1427,6 @@ const LouiseShop = () => {
           object-fit: cover;
         }
 
-        /* Testimonials */
         .testimonials-section {
           background: white;
         }
@@ -1499,7 +1477,6 @@ const LouiseShop = () => {
           font-size: 13px;
         }
 
-        /* Features */
         .features-section {
           background: #2d2d2d;
           padding: 4rem 0;
@@ -1540,7 +1517,6 @@ const LouiseShop = () => {
           font-size: 14px;
         }
 
-        /* Page Headers */
         .page-header {
           text-align: center;
           padding: 4rem 2rem 2rem;
@@ -1560,12 +1536,10 @@ const LouiseShop = () => {
           color: #666;
         }
 
-        /* Shop Page */
         .shop-page {
           min-height: 80vh;
         }
 
-        /* Product Detail Page */
         .product-page {
           padding: 3rem 0;
         }
@@ -1711,7 +1685,6 @@ const LouiseShop = () => {
           line-height: 1.6;
         }
 
-        /* Cart Page */
         .cart-page {
           min-height: 80vh;
           padding: 3rem 0;
@@ -1889,7 +1862,6 @@ const LouiseShop = () => {
           gap: 0.5rem;
         }
 
-        /* About Page */
         .about-hero {
           background: linear-gradient(135deg, #f9f3ee 0%, #f0e6dc 100%);
           padding: 5rem 2rem;
@@ -1966,7 +1938,6 @@ const LouiseShop = () => {
           color: #555;
         }
 
-        /* Contact Page */
         .contact-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
@@ -2103,7 +2074,6 @@ const LouiseShop = () => {
           border-color: #d4a574;
         }
 
-        /* Footer */
         .footer {
           background: #2d2d2d;
           color: white;
@@ -2211,7 +2181,6 @@ const LouiseShop = () => {
           margin-bottom: 0.5rem;
         }
 
-        /* Responsive */
         @media (max-width: 1024px) {
           .nav-links {
             position: fixed;
